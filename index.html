@@ -28,27 +28,21 @@
       searchForm.addEventListener("submit", function(e) {
         e.preventDefault();
         let q = document.getElementById("searchText").value;
-        search(q);
+        search(q).catch(err => {
+          console.error(err.message);
+        });
       });
 
-      function search(q) {
+      async function search(q) {
         const apiKey = "dJGMhFzC5yEWiwvey9e2xUwXeWxT64ag";
         const path = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${q}`;
 
-        fetch(path, { mode: "cors" })
-          .then(function(res) {
-            return res.json();
-          })
-          .then(function(json) {
-            console.log(json);
-            clearGifs();
-            json.data.forEach(function(obj) {
-              addGif(obj.images.fixed_width.url);
-            });
-          })
-          .catch(function(err) {
-            console.log(err.message);
-          });
+        const response = await fetch(path, { mode: "cors" });
+        const gifData = await response.json();
+        clearGifs();
+        gifData.data.forEach(function(obj) {
+          addGif(obj.images.fixed_width.url);
+        });
       }
 
       function clearGifs() {
